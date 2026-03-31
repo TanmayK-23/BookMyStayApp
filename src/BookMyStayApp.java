@@ -704,3 +704,84 @@ class UseCase9ErrorHandlingValidation {
         }
     }
 }
+
+/**
+ * ================================================================
+ * CLASS - CancellationService
+ * ================================================================
+ *
+ * Use Case 10: Booking Cancellation & Inventory Rollback
+ *
+ * @version 10.0
+ */
+class CancellationService {
+
+    private java.util.Stack<String> releasedRoomIds;
+    private java.util.Map<String, String> reservationRoomTypeMap;
+
+    public CancellationService() {
+        releasedRoomIds = new java.util.Stack<>();
+        reservationRoomTypeMap = new java.util.HashMap<>();
+    }
+
+    public void registerBooking(String reservationId, String roomType) {
+        reservationRoomTypeMap.put(reservationId, roomType);
+    }
+
+    public void cancelBooking(String reservationId, RoomInventory inventory) {
+
+        if (!reservationRoomTypeMap.containsKey(reservationId)) {
+            System.out.println("Invalid reservation ID.");
+            return;
+        }
+
+        String roomType = reservationRoomTypeMap.get(reservationId);
+
+        releasedRoomIds.push(reservationId);
+
+        java.util.Map<String, Integer> availability = inventory.getRoomAvailability();
+        inventory.updateAvailability(roomType, availability.get(roomType) + 1);
+
+        System.out.println("Booking cancelled successfully. Inventory restored for room type: " + roomType);
+    }
+
+    public void showRollbackHistory() {
+
+        System.out.println("\nRollback History (Most Recent First):");
+
+        while (!releasedRoomIds.isEmpty()) {
+            System.out.println("Released Reservation ID: " + releasedRoomIds.pop());
+        }
+    }
+}
+
+/**
+ * ================================================================
+ * MAIN CLASS - UseCase10BookingCancellation
+ * ================================================================
+ *
+ * Use Case 10: Booking Cancellation & Inventory Rollback
+ *
+ * @version 10.0
+ */
+class UseCase10BookingCancellation {
+
+    public static void main(String[] args) {
+
+        System.out.println("Booking Cancellation");
+
+        RoomInventory inventory = new RoomInventory();
+        CancellationService service = new CancellationService();
+
+        String reservationId = "Single-1";
+
+        service.registerBooking(reservationId, "Single");
+
+        service.cancelBooking(reservationId, inventory);
+
+        service.showRollbackHistory();
+
+        System.out.println("\nUpdated Single Room Availability: " +
+                inventory.getRoomAvailability().get("Single"));
+    }
+}
