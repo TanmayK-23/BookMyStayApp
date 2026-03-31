@@ -885,3 +885,88 @@ class UseCase11ConcurrentBookingSimulation {
         System.out.println("Suite: " + inventory.getRoomAvailability().get("Suite"));
     }
 }
+
+/**
+ * ================================================================
+ * CLASS - FilePersistenceService
+ * ================================================================
+ *
+ * Use Case 12: Data Persistence & System Recovery
+ *
+ * @version 12.0
+ */
+class FilePersistenceService {
+
+    public void saveInventory(RoomInventory inventory, String filePath) {
+
+        try (java.io.PrintWriter writer = new java.io.PrintWriter(filePath)) {
+
+            for (java.util.Map.Entry<String, Integer> entry : inventory.getRoomAvailability().entrySet()) {
+                writer.println(entry.getKey() + "=" + entry.getValue());
+            }
+
+            System.out.println("Inventory saved successfully.");
+
+        } catch (Exception e) {
+            System.out.println("Error saving inventory.");
+        }
+    }
+
+    public void loadInventory(RoomInventory inventory, String filePath) {
+
+        java.io.File file = new java.io.File(filePath);
+
+        if (!file.exists()) {
+            System.out.println("No valid inventory data found. Starting fresh.");
+            return;
+        }
+
+        try (java.util.Scanner scanner = new java.util.Scanner(file)) {
+
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split("=");
+
+                if (parts.length == 2) {
+                    inventory.updateAvailability(parts[0], Integer.parseInt(parts[1]));
+                }
+            }
+
+            System.out.println("Inventory loaded successfully.");
+
+        } catch (Exception e) {
+            System.out.println("Error loading inventory.");
+        }
+    }
+}
+
+/**
+ * ================================================================
+ * MAIN CLASS - UseCase12DataPersistenceRecovery
+ * ================================================================
+ *
+ * Use Case 12: Data Persistence & System Recovery
+ *
+ * @version 12.0
+ */
+class UseCase12DataPersistenceRecovery {
+
+    public static void main(String[] args) {
+
+        System.out.println("System Recovery\n");
+
+        String filePath = "inventory.txt";
+
+        RoomInventory inventory = new RoomInventory();
+        FilePersistenceService persistence = new FilePersistenceService();
+
+        persistence.loadInventory(inventory, filePath);
+
+        System.out.println("\nCurrent Inventory:");
+        for (java.util.Map.Entry<String, Integer> entry : inventory.getRoomAvailability().entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+
+        persistence.saveInventory(inventory, filePath);
+    }
+}
