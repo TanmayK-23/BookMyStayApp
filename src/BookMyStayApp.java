@@ -358,3 +358,86 @@ class UseCase5BookingRequestQueue {
         }
     }
 }
+
+/**
+ * ================================================================
+ * CLASS - RoomAllocationService
+ * ================================================================
+ *
+ * Use Case 6: Reservation Confirmation & Room Allocation
+ *
+ * @version 6.0
+ */
+class RoomAllocationService {
+
+    private java.util.Set<String> allocatedRoomIds;
+    private java.util.Map<String, java.util.Set<String>> assignedRoomsByType;
+
+    public RoomAllocationService() {
+        allocatedRoomIds = new java.util.HashSet<>();
+        assignedRoomsByType = new java.util.HashMap<>();
+    }
+
+    public void allocateRoom(Reservation reservation, RoomInventory inventory) {
+
+        String roomType = reservation.getRoomType();
+        java.util.Map<String, Integer> availability = inventory.getRoomAvailability();
+
+        if (availability.get(roomType) != null && availability.get(roomType) > 0) {
+
+            String roomId = generateRoomId(roomType);
+
+            allocatedRoomIds.add(roomId);
+
+            assignedRoomsByType
+                    .computeIfAbsent(roomType, k -> new java.util.HashSet<>())
+                    .add(roomId);
+
+            inventory.updateAvailability(roomType, availability.get(roomType) - 1);
+
+            System.out.println("Booking confirmed for Guest: " + reservation.getGuestName()
+                    + ", Room ID: " + roomId);
+
+        } else {
+            System.out.println("No rooms available for " + roomType);
+        }
+    }
+
+    private String generateRoomId(String roomType) {
+
+        int count = assignedRoomsByType.getOrDefault(roomType, new java.util.HashSet<>()).size() + 1;
+
+        return roomType + "-" + count;
+    }
+}
+
+/**
+ * ================================================================
+ * MAIN CLASS - UseCase6RoomAllocation
+ * ================================================================
+ *
+ * Use Case 6: Reservation Confirmation & Room Allocation
+ *
+ * @version 6.0
+ */
+class UseCase6RoomAllocation {
+
+    public static void main(String[] args) {
+
+        System.out.println("Room Allocation Processing");
+
+        RoomInventory inventory = new RoomInventory();
+        BookingRequestQueue queue = new BookingRequestQueue();
+
+        queue.addRequest(new Reservation("Abhi", "Single"));
+        queue.addRequest(new Reservation("Subha", "Single"));
+        queue.addRequest(new Reservation("Vanmathi", "Suite"));
+
+        RoomAllocationService service = new RoomAllocationService();
+
+        while (queue.hasPendingRequests()) {
+            Reservation r = queue.getNextRequest();
+            service.allocateRoom(r, inventory);
+        }
+    }
+}
