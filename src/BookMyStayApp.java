@@ -532,3 +532,78 @@ class UseCase7AddOnServiceSelection {
         System.out.println("Total Add-On Cost: " + totalCost);
     }
 }
+
+
+/**
+ * ================================================================
+ * CLASS - BookingHistory
+ * ================================================================
+ *
+ * Use Case 8: Booking History & Reporting
+ *
+ * @version 8.0
+ */
+class BookingHistory {
+
+    private java.util.List<Reservation> confirmedReservations;
+
+    public BookingHistory() {
+        confirmedReservations = new java.util.ArrayList<>();
+    }
+
+    public void addReservation(Reservation reservation) {
+        confirmedReservations.add(reservation);
+    }
+
+    public java.util.List<Reservation> getConfirmedReservations() {
+        return confirmedReservations;
+    }
+}
+
+/**
+ * ================================================================
+ * CLASS - BookingReportService
+ * ================================================================
+ *
+ * Use Case 8: Booking History & Reporting
+ *
+ * @version 8.0
+ */
+class BookingReportService {
+
+    public void generateReport(BookingHistory history) {
+
+        System.out.println("\nBooking History Report");
+
+        for (Reservation r : history.getConfirmedReservations()) {
+            System.out.println("Guest: " + r.getGuestName()
+                    + ", Room Type: " + r.getRoomType());
+        }
+    }
+}
+
+/**
+ * ================================================================
+ * MAIN CLASS - UseCase8BookingHistoryReport
+ * ================================================================
+ *
+ * Use Case 8: Booking History & Reporting
+ *
+ * @version 8.0
+ */
+class UseCase8BookingHistoryReport {
+
+    public static void main(String[] args) {
+
+        System.out.println("Booking History and Reporting\n");
+
+        BookingHistory history = new BookingHistory();
+
+        history.addReservation(new Reservation("Abhi", "Single"));
+        history.addReservation(new Reservation("Subha", "Double"));
+        history.addReservation(new Reservation("Vanmathi", "Suite"));
+
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(history);
+    }
+}
