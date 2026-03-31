@@ -131,3 +131,66 @@ class UseCase2RoomInitialization {
         suite.displayRoomDetails(2);
     }
 }
+
+/**
+ * ================================================================
+ * CLASS - RoomInventory
+ * ================================================================
+ *
+ * Use Case 3: Centralized Room Inventory Management
+ *
+ * @version 3.0
+ */
+class RoomInventory {
+
+    private java.util.Map<String, Integer> roomAvailability;
+
+    public RoomInventory() {
+        roomAvailability = new java.util.HashMap<>();
+        initializeInventory();
+    }
+
+    private void initializeInventory() {
+        roomAvailability.put("Single", 5);
+        roomAvailability.put("Double", 3);
+        roomAvailability.put("Suite", 2);
+    }
+
+    public java.util.Map<String, Integer> getRoomAvailability() {
+        return roomAvailability;
+    }
+
+    public void updateAvailability(String roomType, int count) {
+        roomAvailability.put(roomType, count);
+    }
+}
+
+/**
+ * ================================================================
+ * MAIN CLASS - UseCase3InventorySetup
+ * ================================================================
+ *
+ * @version 3.0
+ */
+class UseCase3InventorySetup {
+
+    public static void main(String[] args) {
+
+        System.out.println("Hotel Room Inventory Status\n");
+
+        RoomInventory inventory = new RoomInventory();
+
+        SingleRoom single = new SingleRoom();
+        DoubleRoom dbl = new DoubleRoom();
+        SuiteRoom suite = new SuiteRoom();
+
+        System.out.println("Single Room:");
+        single.displayRoomDetails(inventory.getRoomAvailability().get("Single"));
+
+        System.out.println("Double Room:");
+        dbl.displayRoomDetails(inventory.getRoomAvailability().get("Double"));
+
+        System.out.println("Suite Room:");
+        suite.displayRoomDetails(inventory.getRoomAvailability().get("Suite"));
+    }
+}
